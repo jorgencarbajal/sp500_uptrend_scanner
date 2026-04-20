@@ -5,3 +5,10 @@ build/
 *.egg-info/
 __pycache__/
 .claude
+notes.md
+
+# Pulled market data and generated outputs
+scanner/data/universe/*.csv
+scanner/data/prices/**/*.csv
+scanner/data/curated/*.csv
+scanner/data/outputs/**/*.csv

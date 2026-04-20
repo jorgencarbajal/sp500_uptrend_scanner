@@ -1,1 +1,3 @@
-This repository is for everything trading and investing, all code is in python. Notes is where you can find notes on what everything does (mainly for my personal use)
+## UNDER CONSTRUCTION
+
+*This repo pulls daily market data from a Polygon IO API. The data in focus is the S&P 500 tickers. Filters narrow the data to focus in on tickers that meet certain criteria.*
