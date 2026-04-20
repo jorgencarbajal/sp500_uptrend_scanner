@@ -58,28 +58,39 @@ def fetch_csv_bytes(url: str = IVV_HOLDINGS_URL, timeout_seconds: int = 30) -> b
         ) from exc
 
 
+# this function loops through the entire list of list to look for the row that contains the headers
 def find_header_row(rows: list[list[str]]) -> int:
     for row_index, row in enumerate(rows):
+        # convert the row to a set and compare if it matches what is intended
         normalized_cells = {cell.strip() for cell in row if cell.strip()}
         if REQUIRED_HEADER_COLUMNS.issubset(normalized_cells):
             return row_index
+    # if we make it through the entire function without finding a matching row
     raise ValueError("Could not locate the holdings table header in the IVV CSV.")
 
 
+# pull the holdings "as of" date out of the CSV preamble if it exists
 def extract_holdings_as_of(rows: list[list[str]], header_row: int) -> date | None:
+    # loop throught the rows that come before the header row
     for row in rows[:header_row]:
         for column_index, cell in enumerate(row):
+            # skip over crap
             if cell.strip() != "Fund Holdings as of":
                 continue
 
+            # if we have reached the end of the row
             if column_index + 1 >= len(row):
                 continue
 
+            # take the cell next to the "Fund Hold..." cell
             raw_value = row[column_index + 1].strip()
+            # incase that is empty
             if not raw_value:
                 continue
 
+            # convert to pandas datetime object
             parsed = pd.to_datetime(raw_value, errors="coerce")
+            # if the conversion failed continue looking throught the data
             if pd.isna(parsed):
                 continue
             return parsed.date()
@@ -87,14 +98,19 @@ def extract_holdings_as_of(rows: list[list[str]], header_row: int) -> date | Non
     return None
 
 
+# take that raw csv file
 def parse_holdings_csv(raw_csv: bytes) -> tuple[pd.DataFrame, date | None]:
     # decode the bytes into one full string
     text = raw_csv.decode("utf-8-sig")
     # wrap the string so python can read the file as if it were in memory. in the end rows is a nested list of all the tickers
     rows = list(csv.reader(io.StringIO(text)))
+    # from that list of list, look for the headers
     header_row = find_header_row(rows)
+
+    # get the date for when this csv was last updated
     holdings_as_of = extract_holdings_as_of(rows, header_row)
 
+    # 
     holdings = pd.read_csv(io.StringIO(text), skiprows=header_row, dtype="string")
     holdings.columns = [str(column).strip() for column in holdings.columns]
     holdings = holdings.dropna(how="all").reset_index(drop=True)
