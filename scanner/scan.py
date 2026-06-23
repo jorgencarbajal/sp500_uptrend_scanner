@@ -45,12 +45,12 @@ def main():
                     {
                         "symbol": symbol,
                         "last_price": current_price,
-                        "average_volume": average_volume,
-                        "relative_volume": relative_volume,
-                        "average_true_range": atr,
-                        "sma_20": sma_20,
-                        "sma_50": sma_50,
-                        "sma_200": sma_200,
+                        "average_volume": f"{average_volume:.0f}",
+                        "relative_volume": f"{relative_volume:.1f}",
+                        "average_true_range": f"{atr:.2f}",
+                        "sma_20": f"{sma_20:.2f}",
+                        "sma_50": f"{sma_50:.2f}",
+                        "sma_200": f"{sma_200:.2f}",
                     }
                 )
 
