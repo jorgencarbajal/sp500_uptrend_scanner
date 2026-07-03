@@ -7,14 +7,3 @@ __pycache__/
 .claude
 notes.md
 .env
-
-# Pulled market data and generated outputs
-scanner/data/universe/*.csv
-scanner/data/prices/**/*.csv
-scanner/data/curated/*.csv
-scanner/data/outputs/**/*.csv
-scanner/data/universe/*.xlsx
-scanner/data/prices/**/*.xlsx
-scanner/data/curated/*.xlsx
-scanner/data/outputs/**/*.xlsx
-scanner/*.csv
