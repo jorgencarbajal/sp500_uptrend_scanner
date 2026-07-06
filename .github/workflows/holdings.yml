@@ -1,0 +1,45 @@
+name: Update S&P 500 Universe
+
+on:
+  schedule:
+    # Sundays at 12:00 UTC (~7am ET winter / 8am ET summer, ~4am PT winter / 5am PT summer)
+    - cron: "0 12 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-universe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run holdings.py
+        run: uv run python -m scanner.data.universe.holdings
+
+      - name: Commit updated universe
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scanner/data/universe/sp500_current.csv scanner/data/universe/holdings_*.xlsx
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: refresh S&P 500 universe"
+            git push
+          fi
